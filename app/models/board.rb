@@ -3,4 +3,6 @@ class Board < ApplicationRecord
   validates :content, presence: true
 
   mount_uploader :image, ImageUploader
+
+  has_many :comments, dependent: :destroy
 end
