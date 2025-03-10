@@ -34,6 +34,7 @@
             <h2 class="text-xl font-semibold text-gray-800 mb-2"><%= board.title %></h2>
             <p class="text-gray-600 mb-4"><%= board.content %></p>
             <div class="flex justify-between items-center text-sm text-gray-500">
+              <span>投稿者: <%= board.user&.email || '不明' %></span>
               <span>作成日: <%= board.created_at.strftime('%Y/%m/%d') %></span>
             </div>
           <% end %>
