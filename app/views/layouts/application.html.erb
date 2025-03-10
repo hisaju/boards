@@ -19,7 +19,32 @@
   </head>
 
   <body>
-    <main class="container mx-auto mt-28 px-5">
+    <nav class="bg-white shadow">
+      <div class="container mx-auto px-6 py-3">
+        <div class="flex justify-between items-center">
+          <div>
+            <%= link_to "Boards", root_path, class: "text-xl font-bold text-gray-800" %>
+          </div>
+          <div class="flex items-center">
+            <% if user_signed_in? %>
+              <span class="text-gray-600 mr-4"><%= current_user.email %></span>
+              <%= button_to "ログアウト", destroy_user_session_path, method: :delete, class: "px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-500" %>
+            <% else %>
+              <%= link_to "ログイン", new_user_session_path, class: "px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 mr-2" %>
+              <%= link_to "会員登録", new_user_registration_path, class: "px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-500" %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </nav>
+    
+    <main class="container mx-auto mt-10 px-5">
+      <% if notice %>
+        <p class="notice bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4"><%= notice %></p>
+      <% end %>
+      <% if alert %>
+        <p class="alert bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4"><%= alert %></p>
+      <% end %>
       <%= yield %>
     </main>
   </body>

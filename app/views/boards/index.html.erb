@@ -1,7 +1,27 @@
 <div class="min-h-screen bg-gray-100">
   <div class="container mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold text-gray-900 mb-8">ボード一覧</h1>
-    
+    <div class="flex justify-between items-center mb-8">
+      <h1 class="text-3xl font-bold text-gray-900">ボード一覧</h1>
+      
+      <!-- Ransack検索フォーム -->
+      <%= search_form_for @q, url: boards_path, html: { method: :get, class: "w-full max-w-sm" } do |f| %>
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+            <svg class="w-4 h-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+            </svg>
+          </div>
+          <%= f.search_field :title_cont, 
+                             placeholder: "タイトルで検索...", 
+                             class: "block w-full p-2.5 pl-10 pr-20 text-sm text-gray-900 border border-gray-300 rounded-lg bg-white focus:ring-blue-500 focus:border-blue-500" %>
+          <div class="absolute inset-y-0 right-0">
+            <%= f.submit "検索", 
+                         class: "h-full px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-r-lg border border-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300" %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+    <!-- ボード一覧 -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <% @boards.each do |board| %>
         <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
@@ -14,6 +34,7 @@
             <h2 class="text-xl font-semibold text-gray-800 mb-2"><%= board.title %></h2>
             <p class="text-gray-600 mb-4"><%= board.content %></p>
             <div class="flex justify-between items-center text-sm text-gray-500">
+              <span>投稿者: <%= board.user&.email || '不明' %></span>
               <span>作成日: <%= board.created_at.strftime('%Y/%m/%d') %></span>
             </div>
           <% end %>
@@ -21,8 +42,40 @@
       <% end %>
     </div>
 
-    <div class="mt-8">
-      <%= link_to '新規ボード作成', new_board_path, class: "inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-300" %>
+    <!-- ページネーションとアクションボタン -->
+    <div class="mt-8 flex justify-between items-center">
+      <div class="pagination">
+        <% if @boards.respond_to?(:total_pages) %>
+          <nav class="flex items-center space-x-1">
+            <% if @boards.prev_page %>
+              <%= link_to_prev_page @boards, '前へ', class: 'px-3 py-1 rounded text-blue-600 hover:bg-blue-100' %>
+            <% else %>
+              <span class="px-3 py-1 text-gray-400">前へ</span>
+            <% end %>
+            
+            <% @boards.total_pages.times do |i| %>
+              <% if @boards.current_page == i + 1 %>
+                <span class="px-3 py-1 rounded bg-blue-600 text-white"><%= i + 1 %></span>
+              <% else %>
+                <%= link_to i + 1, boards_path(page: i + 1, q: params[:q]), class: 'px-3 py-1 rounded text-blue-600 hover:bg-blue-100' %>
+              <% end %>
+            <% end %>
+            
+            <% if @boards.next_page %>
+              <%= link_to_next_page @boards, '次へ', class: 'px-3 py-1 rounded text-blue-600 hover:bg-blue-100' %>
+            <% else %>
+              <span class="px-3 py-1 text-gray-400">次へ</span>
+            <% end %>
+          </nav>
+        <% end %>
+      </div>
+      
+      <%= link_to new_board_path, class: "inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-300" do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+        </svg>
+        新規ボード作成
+      <% end %>
     </div>
   </div>
 </div>

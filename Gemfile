@@ -67,3 +67,6 @@ gem "carrierwave"
 
 gem 'redis'
 gem 'redis-actionpack'
+gem 'ransack'
+gem 'kaminari'
+gem 'devise'
