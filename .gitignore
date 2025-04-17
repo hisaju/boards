@@ -42,3 +42,4 @@
 *.swp
 
 /config/credentials/production.key
+/public/uploads
