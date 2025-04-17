@@ -1,6 +1,10 @@
 class BoardsController < ApplicationController
+  before_action :authenticate_user!, except: [:index, :show]
+  
   def index
-    @boards = Board.all.order(created_at: :desc)
+    # Ransackを使って検索機能を実装
+    @q = Board.ransack(params[:q])
+    @boards = @q.result(distinct: true).page(params[:page]).per(5)
   end
 
   def show
@@ -12,7 +16,7 @@ class BoardsController < ApplicationController
   end
 
   def create
-    @board = Board.new(board_params)
+    @board = current_user.boards.build(board_params)
     if @board.save
       redirect_to boards_path, notice: '掲示板を作成しました'
     else
@@ -21,11 +25,11 @@ class BoardsController < ApplicationController
   end
 
   def edit
-    @board = Board.find(params[:id])
+    @board = find_own_board
   end
 
   def update
-    @board = Board.find(params[:id])
+    @board = find_own_board
     if @board.update(board_params)
       redirect_to board_path(@board), notice: '掲示板を更新しました'
     else
@@ -34,7 +38,7 @@ class BoardsController < ApplicationController
   end
 
   def destroy
-    @board = Board.find(params[:id])
+    @board = find_own_board
     @board.destroy
     redirect_to boards_path, notice: '掲示板を削除しました', status: :see_other
   end
@@ -43,5 +47,14 @@ class BoardsController < ApplicationController
 
   def board_params
     params.require(:board).permit(:title, :content, :image)
+  end
+  
+  def find_own_board
+    board = current_user.boards.find_by(id: params[:id])
+    if board.nil?
+      redirect_to boards_path, alert: 'アクセス権限がありません'
+      return
+    end
+    board
   end
 end

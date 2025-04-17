@@ -1,7 +1,10 @@
 class CommentsController < ApplicationController
+  before_action :authenticate_user!
+  
   def create
     @board = Board.find(params[:board_id])
     @comment = @board.comments.build(comment_params)
+    @comment.user = current_user
 
     if @comment.save
       redirect_to @board, notice: "コメントを投稿しました"
